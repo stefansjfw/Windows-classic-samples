@@ -20,7 +20,7 @@
 // this thumbnail provider implements IInitializeWithStream to enable being hosted
 // in an isolated process for robustness
 
-class CRecipeThumbProvider : public IInitializeWithStream,
+class CRecipeThumbProvider : public IInitializeWithFile,
                              public IThumbnailProvider
 {
 public:
@@ -41,7 +41,7 @@ public:
     {
         static const QITAB qit[] =
         {
-            QITABENT(CRecipeThumbProvider, IInitializeWithStream),
+            QITABENT(CRecipeThumbProvider, IInitializeWithFile),
             QITABENT(CRecipeThumbProvider, IThumbnailProvider),
             { 0 },
         };
@@ -64,7 +64,7 @@ public:
     }
 
     // IInitializeWithStream
-    IFACEMETHODIMP Initialize(IStream *pStream, DWORD grfMode);
+    IFACEMETHODIMP Initialize(LPCWSTR pszFilePath, DWORD grfMode);
 
     // IThumbnailProvider
     IFACEMETHODIMP GetThumbnail(UINT cx, HBITMAP *phbmp, WTS_ALPHATYPE *pdwAlpha);
@@ -91,15 +91,16 @@ HRESULT CRecipeThumbProvider_CreateInstance(REFIID riid, void **ppv)
 }
 
 // IInitializeWithStream
-IFACEMETHODIMP CRecipeThumbProvider::Initialize(IStream *pStream, DWORD)
+IFACEMETHODIMP CRecipeThumbProvider::Initialize(LPCWSTR pszFilePath, DWORD)
 {
-    HRESULT hr = E_UNEXPECTED;  // can only be inited once
-    if (_pStream == NULL)
-    {
-        // take a reference to the stream if we have not been inited yet
-        hr = pStream->QueryInterface(&_pStream);
-    }
-    return hr;
+    MessageBox(NULL, pszFilePath, NULL, NULL);
+    //HRESULT hr = E_UNEXPECTED;  // can only be inited once
+    //if (_pStream == NULL)
+    //{
+    //    // take a reference to the stream if we have not been inited yet
+    //    hr = pStream->QueryInterface(&_pStream);
+    //}
+    return S_OK;
 }
 
 HRESULT CRecipeThumbProvider::_LoadXMLDocument(IXMLDOMDocument **ppXMLDoc)
@@ -259,7 +260,7 @@ HRESULT ConvertBitmapSourceTo32BPPHBITMAP(IWICBitmapSource *pBitmapSource,
             hr = hbmp ? S_OK : E_OUTOFMEMORY;
             if (SUCCEEDED(hr))
             {
-                WICRect rect = {0, 0, nWidth, nHeight};
+                WICRect rect = {0, 0, (INT)nWidth, (INT)nHeight};
 
                 // Convert the pixels and store them in the HBITMAP.  Note: the name of the function is a little
                 // misleading - we're not doing any extraneous copying here.  CopyPixels is actually converting the

@@ -38,7 +38,7 @@ inline int RECTHEIGHT(const RECT &rc )
 class CRecipePreviewHandler : public IObjectWithSite,
                               public IPreviewHandler,
                               public IOleWindow,
-                              public IInitializeWithStream
+                              public IInitializeWithFile
 {
 public:
     CRecipePreviewHandler() : _cRef(1), _hwndParent(NULL), _hwndPreview(NULL),  _hinstEditLibrary(NULL),
@@ -69,7 +69,7 @@ public:
         {
             QITABENT(CRecipePreviewHandler, IObjectWithSite),
             QITABENT(CRecipePreviewHandler, IOleWindow),
-            QITABENT(CRecipePreviewHandler, IInitializeWithStream),
+            QITABENT(CRecipePreviewHandler, IInitializeWithFile),
             QITABENT(CRecipePreviewHandler, IPreviewHandler),
             { 0 },
         };
@@ -109,7 +109,7 @@ public:
     IFACEMETHODIMP ContextSensitiveHelp(BOOL fEnterMode);
 
     // IInitializeWithStream
-    IFACEMETHODIMP Initialize(IStream *pStream, DWORD grfMode);
+    IFACEMETHODIMP Initialize(LPCWSTR pszFilePath, DWORD grfMode);
 
 private:
     HRESULT _CreatePreviewWindow(PCWSTR pszRtf);
@@ -299,20 +299,21 @@ HRESULT CRecipePreviewHandler::ContextSensitiveHelp(BOOL)
 
 // IInitializeWithStream methods
 // This method gets called when an item gets selected in listview
-HRESULT CRecipePreviewHandler::Initialize(IStream *pStream, DWORD)
+HRESULT CRecipePreviewHandler::Initialize(LPCWSTR pszFilePath, DWORD)
 {
-    HRESULT hr = E_INVALIDARG;
-    if (pStream)
-    {
-        // Initialize can be called more than once, so release existing valid _pStream
-        SafeRelease(&_pStream);
+    MessageBox(NULL, pszFilePath, NULL, NULL);
+    // HRESULT hr = E_INVALIDARG;
+    //if (pStream)
+    //{
+    //    // Initialize can be called more than once, so release existing valid _pStream
+    //    SafeRelease(&_pStream);
 
-        _pStream = pStream;
-        _pStream->AddRef();
-        hr = S_OK;
-    }
+    //    _pStream = pStream;
+    //    _pStream->AddRef();
+    //    hr = S_OK;
+    //}
 
-    return hr;
+    return S_OK;
 }
 
 // Helper method to post text content to the previewer window
